@@ -14,7 +14,19 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>" />
 </head>
 <body>
-
+  
+<script>
+  // ตัวอย่าง: ถ้าข้อมูลอยู่ในตัวแปร data
+  document.addEventListener("DOMContentLoaded", () => {
+    if (typeof data !== 'undefined') {
+      // เปลี่ยนชื่อหัวข้อหลัก
+      document.querySelector('.landing-title').innerHTML = data.title.replace(/\n/g, '<br/>');
+      // เปลี่ยนข้อความในจดหมาย
+      document.querySelector('.letter-body').textContent = data.letterBody;
+      // ...ทำแบบนี้กับทุกจุดที่คุณต้องการให้เปลี่ยน
+    }
+  });
+</script>
   <!-- ============================================================
        LOADING SCREEN
        ============================================================ -->
