@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔧 Birthday Admin Panel</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0f0f13;
+      --bg2:       #17171f;
+      --bg3:       #1e1e2a;
+      --border:    #2e2e3e;
+      --accent:    #f4a0b5;
+      --accent2:   #e8789a;
+      --green:     #4ade80;
+      --red:       #f87171;
+      --yellow:    #fbbf24;
+      --text:      #f0f0f5;
+      --text2:     #9090a8;
+      --radius:    10px;
+    }
+    html { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text); background: var(--bg); }
+    body { min-height: 100vh; }
+    a { color: var(--accent); }
+    input, textarea, select {
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); border-radius: var(--radius);
+      padding: 8px 12px; font-family: inherit; font-size: 13px;
+      width: 100%; outline: none; transition: border .2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; line-height: 1.6; }
+    button { cursor: pointer; font-family: inherit; border: none; border-radius: var(--radius); transition: all .15s; }
+    label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 5px; font-weight: 500; letter-spacing: .03em; }
+    .hidden { display: none !important; }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: var(--bg); z-index: 999;
+    }
+    .login-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px 36px; width: 340px;
+      display: flex; flex-direction: column; gap: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .login-title { font-size: 1.3rem; font-weight: 700; text-align: center; }
+    .login-sub   { font-size: 12px; color: var(--text2); text-align: center; margin-top: -12px; }
+    .login-error { color: var(--red); font-size: 12px; text-align: center; min-height: 16px; }
+    .btn-login {
+      background: var(--accent2); color: white; padding: 11px;
+      font-weight: 600; font-size: 14px; border-radius: var(--radius);
+    }
+    .btn-login:hover { background: #d4607e; }
+
+    /* ── LAYOUT ── */
+    #app { display: flex; min-height: 100vh; }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: 220px; background: var(--bg2); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 20px 12px; gap: 4px;
+      position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100;
+    }
+    .sidebar-logo { font-size: 1rem; font-weight: 700; color: var(--accent); padding: 8px 10px 16px; letter-spacing: .02em; }
+    .sidebar-section { font-size: 10px; color: var(--text2); letter-spacing: .08em; padding: 12px 10px 4px; text-transform: uppercase; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: var(--text2);
+      transition: all .15s; border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover  { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: rgba(244,160,181,.12); color: var(--accent); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* ── MAIN CONTENT ── */
+    #main {
+      margin-left: 220px; flex: 1; padding: 28px 32px; max-width: 900px;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px; flex-wrap: wrap;
+    }
+    .topbar-title { font-size: 1.4rem; font-weight: 700; }
+    .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── BUTTONS ── */
+    .btn { padding: 9px 18px; font-size: 13px; font-weight: 600; border-radius: 8px; }
+    .btn-primary { background: var(--accent2); color: white; }
+    .btn-primary:hover { background: #d4607e; transform: translateY(-1px); }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.3); }
+    .btn-danger:hover { background: rgba(248,113,113,.25); }
+    .btn-green { background: rgba(74,222,128,.15); color: var(--green); border: 1px solid rgba(74,222,128,.3); }
+    .btn-green:hover { background: rgba(74,222,128,.25); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ── PANELS ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px; margin-bottom: 16px;
+    }
+    .card-title { font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 16px; letter-spacing: .05em; text-transform: uppercase; }
+
+    /* ── FORM GRID ── */
+    .form-grid { display: grid; gap: 14px; }
+    .form-grid-2 { grid-template-columns: 1fr 1fr; }
+    .form-row { display: flex; flex-direction: column; gap: 5px; }
+
+    /* ── MEMORY CARDS ── */
+    .memory-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; margin-bottom: 12px; position: relative;
+    }
+    .memory-card-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+      justify-content: space-between;
+    }
+    .memory-card-num { font-weight: 700; color: var(--accent); font-size: 13px; }
+    .memory-img-preview {
+      width: 100%; height: 120px; border-radius: 8px; object-fit: cover;
+      border: 1px solid var(--border); background: var(--bg); margin-top: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text2); font-size: 12px;
+    }
+    .memory-img-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+
+    /* ── REASONS LIST ── */
+    .reason-item {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .reason-item input { flex: 1; }
+    .reason-drag { color: var(--text2); cursor: grab; padding: 0 4px; font-size: 16px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast-item {
+      padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4); animation: toastIn .3s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .toast-success { background: #1a2e1a; border: 1px solid var(--green); color: var(--green); }
+    .toast-error   { background: #2e1a1a; border: 1px solid var(--red);   color: var(--red); }
+    .toast-info    { background: #1e1e2a; border: 1px solid var(--accent); color: var(--accent); }
+    @keyframes toastIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: none; } }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; align-items: center;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .dot-green  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot-red    { background: var(--red); }
+    .dot-yellow { background: var(--yellow); }
+    .status-item { font-size: 12px; color: var(--text2); display: flex; align-items: center; }
+    .status-item strong { color: var(--text); margin-left: 4px; }
+
+    /* ── THEME COLORS ── */
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+    .color-item { display: flex; flex-direction: column; gap: 6px; }
+    .color-swatch {
+      width: 100%; height: 36px; border-radius: 8px; border: 2px solid var(--border);
+      cursor: pointer; transition: transform .15s;
+    }
+    .color-swatch:hover { transform: scale(1.05); }
+
+    /* ── SETTINGS TOKEN ── */
+    .token-row { display: flex; gap: 8px; }
+    .token-row input { flex: 1; font-family: monospace; letter-spacing: .05em; }
+
+    /* ── PREVIEW LINK ── */
+    .preview-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px; font-size: 12px;
+      color: var(--accent); text-decoration: none;
+    }
+    .preview-link:hover { border-color: var(--accent); }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { background: var(--bg3); border-radius: 99px; height: 6px; overflow: hidden; }
+    .progress-bar  { height: 100%; background: var(--accent2); border-radius: 99px; transition: width .4s; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 700px) {
+      #sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; padding: 12px; }
+      #main { margin-left: 0; padding: 16px; }
+      .form-grid-2 { grid-template-columns: 1fr; }
+      #app { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-title">🔧 Admin Panel</div>
+    <p class="login-sub">Birthday Website Controller</p>
+    <div class="form-row">
+      <label>Admin Password</label>
+      <input type="password" id="login-pass" placeholder="Enter admin password" />
+    </div>
+    <div class="form-row">
+      <label>GitHub Token <span style="color:var(--text2)">(เก็บแค่ใน browser คุณ)</span></label>
+      <input type="password" id="login-token" placeholder="github_pat_..." />
+    </div>
+    <p class="login-error" id="login-error"></p>
+    <button class="btn-login" id="login-btn">เข้าสู่ระบบ</button>
+    <p style="font-size:11px;color:var(--text2);text-align:center">Token ไม่ถูกส่งไปที่ไหนเลย เก็บแค่ใน sessionStorage ของ browser นี้</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="app" class="hidden">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">💕 Admin</div>
+
+    <div class="sidebar-section">Content</div>
+    <button class="nav-item active" data-panel="dashboard"><span class="nav-icon">📊</span>Dashboard</button>
+    <button class="nav-item" data-panel="texts"><span class="nav-icon">✏️</span>ข้อความหลัก</button>
+    <button class="nav-item" data-panel="timeline"><span class="nav-icon">📖</span>Memory Timeline</button>
+    <button class="nav-item" data-panel="reasons"><span class="nav-icon">💭</span>Reasons I Love You</button>
+    <button class="nav-item" data-panel="letter"><span class="nav-icon">💌</span>จดหมายเค้ก</button>
+    <button class="nav-item" data-panel="secret"><span class="nav-icon">🔒</span>Secret Message</button>
+
+    <div class="sidebar-section">Design</div>
+    <button class="nav-item" data-panel="theme"><span class="nav-icon">🎨</span>Theme & Colors</button>
+
+    <div class="sidebar-section">Deploy</div>
+    <button class="nav-item" data-panel="deploy"><span class="nav-icon">🚀</span>Save & Deploy</button>
+    <button class="nav-item" data-panel="settings"><span class="nav-icon">⚙️</span>Settings</button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="panel active" id="panel-dashboard">
+      <div id="topbar">
+        <div class="topbar-title">📊 Dashboard</div>
+        <div class="topbar-actions">
+          <a class="preview-link" href="index.html" target="_blank">👁️ Preview Website</a>
+          <button class="btn btn-primary" id="quick-deploy-btn">🚀 Save & Deploy</button>
+        </div>
+      </div>
+
+      <div class="status-bar" id="status-bar">
+        <div class="status-item"><span class="status-dot dot-yellow"></span> Loading...</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px;">
+        <div class="card" style="margin:0;text-align:center;">
+          <div style="font-size:2rem">✏️</div>
+          <div style="font-weight:700;margin-top:8px" id="dash-texts">—</div>
+          <div style="color:var(--text2);font-size:12px">ข้อความที่แก้แล้ว</div>
+        </div>
+        <div class="card" style="margin:0;text-align:center;">
+          <div style="font-size:2rem">📖</div>
+          <div style="font-weight:700;margin-top:8px" id="dash-memories">—</div>
+          <div style="color:var(--text2);font-size:12px">Memory Cards</div>
+        </div>
+        <div class="card" style="margin:0;text-align:center;">
+          <div style="font-size:2rem">💭</div>
+          <div style="font-weight:700;margin-top:8px" id="dash-reasons">—</div>
+          <div style="color:var(--text2);font-size:12px">Reasons</div>
+        </div>
+        <div class="card" style="margin:0;text-align:center;">
+          <div style="font-size:2rem">🚀</div>
+          <div style="font-weight:700;margin-top:8px" id="dash-deployed">—</div>
+          <div style="color:var(--text2);font-size:12px">Last Deploy</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Quick Actions</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="goPanel('texts')">✏️ แก้ข้อความ</button>
+          <button class="btn btn-secondary" onclick="goPanel('timeline')">📖 แก้ Memory</button>
+          <button class="btn btn-secondary" onclick="goPanel('reasons')">💭 แก้ Reasons</button>
+          <button class="btn btn-secondary" onclick="goPanel('letter')">💌 แก้จดหมาย</button>
+          <button class="btn btn-primary" onclick="goPanel('deploy')">🚀 Deploy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TEXTS ── -->
+    <div class="panel" id="panel-texts">
+      <div id="topbar">
+        <div class="topbar-title">✏️ ข้อความหลัก</div>
+        <button class="btn btn-primary" onclick="saveAll()">💾 บันทึก</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌸 Landing Page</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Pre-title (บรรทัดเล็กบนสุด)</label>
+            <input type="text" id="txt-pretitle" />
+          </div>
+          <div class="form-row">
+            <label>Main Title (ชื่อหลัก)</label>
+            <input type="text" id="txt-title" />
+          </div>
+          <div class="form-row">
+            <label>Subtitle (ประโยคใต้ title)</label>
+            <textarea id="txt-subtitle" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✉️ Birthday Message Section</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Typewriter Text (ข้อความที่พิมพ์ขึ้นมาแบบ animation)</label>
+            <input type="text" id="txt-typewriter" />
+          </div>
+          <div class="form-row">
+            <label>Paragraph 1</label>
+            <textarea id="txt-msg1" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <label>Paragraph 2</label>
+            <textarea id="txt-msg2" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <label>Paragraph 3</label>
+            <textarea id="txt-msg3" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎉 Finale Section</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Finale Title</label>
+            <input type="text" id="txt-finale-title" />
+          </div>
+          <div class="form-row">
+            <label>Finale Subtitle</label>
+            <textarea id="txt-finale-sub" rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <label>Signature (ชื่อลงท้าย)</label>
+            <input type="text" id="txt-finale-sign" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚙️ ตั้งค่าทั่วไป</div>
+        <div class="form-grid form-grid-2">
+          <div class="form-row">
+            <label>Secret Password (รหัส unlock)</label>
+            <input type="text" id="txt-password" placeholder="DDMMYYYY" />
+          </div>
+          <div class="form-row">
+            <label>Site URL (GitHub Pages URL)</label>
+            <input type="text" id="txt-siteurl" placeholder="https://tomoskill.github.io/birthday" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TIMELINE ── -->
+    <div class="panel" id="panel-timeline">
+      <div id="topbar">
+        <div class="topbar-title">📖 Memory Timeline</div>
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" id="add-memory-btn">+ เพิ่ม Memory</button>
+          <button class="btn btn-primary" onclick="saveAll()">💾 บันทึก</button>
+        </div>
+      </div>
+      <div id="memories-list"></div>
+    </div>
+
+    <!-- ── REASONS ── -->
+    <div class="panel" id="panel-reasons">
+      <div id="topbar">
+        <div class="topbar-title">💭 Reasons I Love You</div>
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" id="add-reason-btn">+ เพิ่ม Reason</button>
+          <button class="btn btn-primary" onclick="saveAll()">💾 บันทึก</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">รายการ Reasons (ลากเพื่อเรียงลำดับ)</div>
+        <div id="reasons-list"></div>
+      </div>
+    </div>
+
+    <!-- ── LETTER ── -->
+    <div class="panel" id="panel-letter">
+      <div id="topbar">
+        <div class="topbar-title">💌 จดหมายหลังเป่าเค้ก</div>
+        <button class="btn btn-primary" onclick="saveAll()">💾 บันทึก</button>
+      </div>
+      <div class="card">
+        <div class="card-title">เนื้อหาจดหมาย</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>คำขึ้นต้น (Salutation)</label>
+            <input type="text" id="letter-salutation" placeholder="ถึงคนที่รักที่สุดในโลก," />
+          </div>
+          <div class="form-row">
+            <label>เนื้อหาจดหมาย (เว้นบรรทัดสำหรับ paragraph ใหม่)</label>
+            <textarea id="letter-body" rows="12" placeholder="เขียนจดหมายของคุณที่นี่...&#10;&#10;เว้นบรรทัดว่างเพื่อขึ้น paragraph ใหม่"></textarea>
+          </div>
+          <div class="form-row">
+            <label>ลงชื่อ (Closing)</label>
+            <input type="text" id="letter-closing" placeholder="ด้วยความรักทั้งหมด, ชื่อของคุณ 💗" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECRET ── -->
+    <div class="panel" id="panel-secret">
+      <div id="topbar">
+        <div class="topbar-title">🔒 Secret Message</div>
+        <button class="btn btn-primary" onclick="saveAll()">💾 บันทึก</button>
+      </div>
+      <div class="card">
+        <div class="card-title">ข้อความลับ</div>
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Password Hint (hint ที่แสดงให้ผู้อ่าน)</label>
+            <input type="text" id="secret-hint-txt" />
+          </div>
+          <div class="form-row">
+            <label>คำขึ้นต้น</label>
+            <input type="text" id="secret-open" />
+          </div>
+          <div class="form-row">
+            <label>เนื้อหา (เว้นบรรทัดเพื่อขึ้น paragraph ใหม่)</label>
+            <textarea id="secret-body" rows="10"></textarea>
+          </div>
+          <div class="form-row">
+            <label>ลงชื่อ</label>
+            <input type="text" id="secret-closing" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── THEME ── -->
+    <div class="panel" id="panel-theme">
+      <div id="topbar">
+        <div class="topbar-title">🎨 Theme & Colors</div>
+        <button class="btn btn-primary" onclick="applyTheme()">✅ Apply & Save</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Color Palette</div>
+        <div class="color-grid" id="color-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Preset Themes</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="applyPreset('rose')">🌹 Rose (Default)</button>
+          <button class="btn btn-secondary" onclick="applyPreset('lavender')">💜 Lavender</button>
+          <button class="btn btn-secondary" onclick="applyPreset('sky')">💙 Sky Blue</button>
+          <button class="btn btn-secondary" onclick="applyPreset('peach')">🍑 Peach</button>
+          <button class="btn btn-secondary" onclick="applyPreset('mint')">🌿 Mint</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEPLOY ── -->
+    <div class="panel" id="panel-deploy">
+      <div id="topbar">
+        <div class="topbar-title">🚀 Save & Deploy</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">GitHub Repository</div>
+        <div class="form-grid form-grid-2">
+          <div class="form-row">
+            <label>Username</label>
+            <input type="text" id="deploy-user" value="tomoskill" />
+          </div>
+          <div class="form-row">
+            <label>Repo Name</label>
+            <input type="text" id="deploy-repo" value="birthday" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Deploy Status</div>
+        <div id="deploy-log" style="font-family:monospace;font-size:12px;color:var(--text2);line-height:1.8;min-height:60px;"></div>
+        <div class="progress-wrap" style="margin-top:12px;">
+          <div class="progress-bar" id="deploy-progress" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="deploy-btn" style="font-size:15px;padding:13px 28px;">🚀 Deploy ไปยัง GitHub Pages</button>
+        <a class="btn btn-secondary" id="deploy-link" href="#" target="_blank" style="text-decoration:none;display:inline-flex;align-items:center;">👁️ เปิดเว็บไซต์</a>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="panel" id="panel-settings">
+      <div id="topbar">
+        <div class="topbar-title">⚙️ Settings</div>
+      </div>
+      <div class="card">
+        <div class="card-title">GitHub Token</div>
+        <p style="color:var(--text2);font-size:12px;margin-bottom:12px;">Token เก็บแค่ใน sessionStorage ของ browser นี้ ปิด tab แล้วหายไปเอง</p>
+        <div class="token-row">
+          <input type="password" id="settings-token" placeholder="github_pat_..." />
+          <button class="btn btn-secondary btn-sm" id="toggle-token-btn">👁️</button>
+          <button class="btn btn-green btn-sm" id="save-token-btn">บันทึก</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Admin Password</div>
+        <div class="form-grid form-grid-2">
+          <div class="form-row">
+            <label>New Password</label>
+            <input type="password" id="new-admin-pass" />
+          </div>
+          <div class="form-row">
+            <label>Confirm</label>
+            <input type="password" id="confirm-admin-pass" />
+          </div>
+        </div>
+        <button class="btn btn-secondary" style="margin-top:12px;" id="change-pass-btn">เปลี่ยน Password</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Danger Zone</div>
+        <button class="btn btn-danger" id="reset-all-btn">🗑️ Reset ทุกอย่างกลับค่าตั้งต้น</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIG — อย่าเปลี่ยนส่วนนี้
+   ============================================================ */
+const GITHUB_USER = 'tomoskill';
+const GITHUB_REPO = 'birthday';
+const ADMIN_PASS_KEY  = 'bdAdmin_pass';
+const DATA_KEY        = 'bdAdmin_data';
+
+/* Default admin password — เปลี่ยนได้ใน Settings */
+const DEFAULT_PASS = 'birthday2025';
+
+/* ── Theme color definitions ── */
+const COLOR_DEFS = [
+  { key: '--pink-soft',  label: 'Pink Soft',   default: '#f9c5d1' },
+  { key: '--pink-mid',   label: 'Pink Mid',    default: '#f4a0b5' },
+  { key: '--pink-deep',  label: 'Pink Deep',   default: '#e8789a' },
+  { key: '--rose',       label: 'Rose',        default: '#c9506e' },
+  { key: '--cream',      label: 'Cream BG',    default: '#fff8f4' },
+  { key: '--peach',      label: 'Peach',       default: '#fde0d0' },
+];
+
+const PRESETS = {
+  rose:     { '--pink-soft':'#f9c5d1','--pink-mid':'#f4a0b5','--pink-deep':'#e8789a','--rose':'#c9506e','--cream':'#fff8f4','--peach':'#fde0d0' },
+  lavender: { '--pink-soft':'#e8d5f5','--pink-mid':'#c9a8e8','--pink-deep':'#a87fd4','--rose':'#7c4fa0','--cream':'#faf5ff','--peach':'#ede0fa' },
+  sky:      { '--pink-soft':'#bde0fe','--pink-mid':'#90c8f8','--pink-deep':'#5ba8e8','--rose':'#2d7ac4','--cream':'#f0f8ff','--peach':'#d0eaff' },
+  peach:    { '--pink-soft':'#ffd6a5','--pink-mid':'#ffb97a','--pink-deep':'#ff9a50','--rose':'#e07020','--cream':'#fffaf0','--peach':'#ffe8c8' },
+  mint:     { '--pink-soft':'#b5e7c8','--pink-mid':'#80d4a0','--pink-deep':'#50bc78','--rose':'#28904e','--cream':'#f0fff5','--peach':'#d0f0de' },
+};
+
+/* ── Default website content ── */
+const DEFAULT_DATA = {
+  pretitle:    '✨ A little something just for you ✨',
+  title:       'Happy Birthday\nMy Love 💕',
+  subtitle:    'To the most wonderful soul I have ever known — today is all about you.',
+  typewriter:  'To my favorite person in the whole universe… 💕',
+  msg1: 'Every single day with you feels like the universe decided to be extra generous. You light up every room you enter, and somehow, you\'ve made my whole world brighter without even trying.',
+  msg2: 'You are curious, passionate, and endlessly kind — the kind of person who makes others feel truly seen. And seeing you every day is the greatest gift I could ever ask for.',
+  msg3: 'On this birthday, I want you to know: you are deeply, completely, wholeheartedly loved.',
+  finaleTitle: 'Thank you for existing\nin my life. ❤️',
+  finaleSub:   'Every day is better because you\'re in it. Happy Birthday, my love.',
+  finaleSign:  '— With all my heart, always 💌',
+  password:    '14022025',
+  siteUrl:     'https://tomoskill.github.io/birthday',
+  letterSalutation: 'ถึงคนที่รักที่สุดในโลก,',
+  letterBody:  'เขียนความรู้สึกของคุณที่นี่ได้เลยครับ\n\nทุกคำที่มาจากใจมีค่ามากกว่าคำสวยหรูเสมอ 💕',
+  letterClosing: 'ด้วยความรักทั้งหมด,\nชื่อของคุณ 💗',
+  secretHint:  'Enter our anniversary date to unlock (format: DDMMYYYY)',
+  secretOpen:  'My darling,',
+  secretBody:  'If you\'re reading this, you remembered our special date — of course you did.\n\nI\'ve been thinking about how to put into words what you mean to me, and the honest truth is: I can\'t.\n\nYou make me want to be a better person. Your laugh is my favorite sound. Your heart is the most beautiful thing I have ever encountered.',
+  secretClosing: 'Forever yours, with every heartbeat. 💗',
+  memories: [
+    { emoji:'🌸', date:'The beginning',    title:'The First Hello',         body:'I still remember the first time we talked. Something in the universe shifted that day.', img:'' },
+    { emoji:'😂', date:'A little later',   title:'The First Real Laugh',    body:'You laughed so hard at something ridiculous, and I realized — I wanted to hear that laugh forever.', img:'' },
+    { emoji:'💫', date:'Our anniversary',  title:'The Day It Became Official', body:'The day I got to call you mine. I smiled so wide my cheeks hurt for a week.', img:'' },
+    { emoji:'🌙', date:'A night to remember', title:'Our Favorite Memory', body:'That evening felt like it was made just for us. Time stopped, and all that existed was you and me.', img:'' },
+    { emoji:'🎂', date:'Today',            title:'Your Birthday 🎉',        body:'Today we celebrate the day the world became infinitely more wonderful.', img:'' },
+  ],
+  reasons: [
+    'The way your eyes light up when you talk about something you love.',
+    'How genuinely kind you are to every single person.',
+    'Your infectious, beautiful laugh that fills every room.',
+    'The way you make ordinary moments feel magical.',
+    'Your curiosity — you make life more interesting just by being in it.',
+    'How deeply you feel everything; your sensitivity is a superpower.',
+    'The warmth you carry — like being near a fireplace on a cold night.',
+    'Simply… you. Every complicated, beautiful, wonderful part of you.',
+  ],
+  themeColors: PRESETS.rose,
+  lastDeploy: null,
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let data = {};
+let ghToken = '';
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = `toast-item toast-${type}`;
+  el.innerHTML = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function log(msg, color='var(--text2)') {
+  const el = document.getElementById('deploy-log');
+  el.innerHTML += `<span style="color:${color}">${msg}</span>\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function setProgress(pct) {
+  document.getElementById('deploy-progress').style.width = pct + '%';
+}
+
+function goPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`[data-panel="${name}"]`)?.classList.add('active');
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function checkLogin() {
+  const storedPass = localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_PASS;
+  const pass  = document.getElementById('login-pass').value;
+  const token = document.getElementById('login-token').value.trim();
+  if (pass !== storedPass) {
+    document.getElementById('login-error').textContent = 'Password ไม่ถูกต้อง';
+    return;
+  }
+  if (!token.startsWith('github_pat_') && !token.startsWith('ghp_')) {
+    document.getElementById('login-error').textContent = 'Token ไม่ถูกต้อง (ต้องขึ้นต้นด้วย github_pat_)';
+    return;
+  }
+  ghToken = token;
+  sessionStorage.setItem('bdToken', token);
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  initApp();
+}
+
+document.getElementById('login-btn').addEventListener('click', checkLogin);
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') checkLogin(); });
+document.getElementById('login-token').addEventListener('keydown', e => { if(e.key==='Enter') checkLogin(); });
+
+/* ============================================================
+   INIT APP
+   ============================================================ */
+function initApp() {
+  // Load data
+  const saved = localStorage.getItem(DATA_KEY);
+  data = saved ? { ...DEFAULT_DATA, ...JSON.parse(saved) } : { ...DEFAULT_DATA };
+
+  // Nav
+  document.querySelectorAll('.nav-item[data-panel]').forEach(btn => {
+    btn.addEventListener('click', () => goPanel(btn.dataset.panel));
+  });
+
+  // Load token in settings
+  document.getElementById('settings-token').value = ghToken;
+
+  loadAllForms();
+  buildMemoriesList();
+  buildReasonsList();
+  buildColorGrid();
+  updateDashboard();
+  updateDeployLink();
+
+  // Buttons
+  document.getElementById('add-memory-btn').addEventListener('click', addMemory);
+  document.getElementById('add-reason-btn').addEventListener('click', addReason);
+  document.getElementById('deploy-btn').addEventListener('click', deployToGitHub);
+  document.getElementById('quick-deploy-btn').addEventListener('click', () => { saveAll(); goPanel('deploy'); deployToGitHub(); });
+  document.getElementById('save-token-btn').addEventListener('click', () => {
+    ghToken = document.getElementById('settings-token').value.trim();
+    sessionStorage.setItem('bdToken', ghToken);
+    toast('✅ Token บันทึกแล้ว', 'success');
+  });
+  document.getElementById('toggle-token-btn').addEventListener('click', () => {
+    const el = document.getElementById('settings-token');
+    el.type = el.type === 'password' ? 'text' : 'password';
+  });
+  document.getElementById('change-pass-btn').addEventListener('click', changePass);
+  document.getElementById('reset-all-btn').addEventListener('click', () => {
+    if (confirm('Reset ทุกอย่างกลับค่า default จริงมั้ย?')) {
+      data = { ...DEFAULT_DATA };
+      localStorage.setItem(DATA_KEY, JSON.stringify(data));
+      loadAllForms(); buildMemoriesList(); buildReasonsList(); buildColorGrid(); updateDashboard();
+      toast('🔄 Reset แล้ว', 'info');
+    }
+  });
+}
+
+/* ============================================================
+   LOAD FORMS
+   ============================================================ */
+function loadAllForms() {
+  const f = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+  f('txt-pretitle',     data.pretitle);
+  f('txt-title',        data.title);
+  f('txt-subtitle',     data.subtitle);
+  f('txt-typewriter',   data.typewriter);
+  f('txt-msg1',         data.msg1);
+  f('txt-msg2',         data.msg2);
+  f('txt-msg3',         data.msg3);
+  f('txt-finale-title', data.finaleTitle);
+  f('txt-finale-sub',   data.finaleSub);
+  f('txt-finale-sign',  data.finaleSign);
+  f('txt-password',     data.password);
+  f('txt-siteurl',      data.siteUrl);
+  f('letter-salutation',data.letterSalutation);
+  f('letter-body',      data.letterBody);
+  f('letter-closing',   data.letterClosing);
+  f('secret-hint-txt',  data.secretHint);
+  f('secret-open',      data.secretOpen);
+  f('secret-body',      data.secretBody);
+  f('secret-closing',   data.secretClosing);
+}
+
+/* ============================================================
+   SAVE ALL
+   ============================================================ */
+function saveAll() {
+  const g = id => document.getElementById(id)?.value || '';
+  data.pretitle    = g('txt-pretitle');
+  data.title       = g('txt-title');
+  data.subtitle    = g('txt-subtitle');
+  data.typewriter  = g('txt-typewriter');
+  data.msg1        = g('txt-msg1');
+  data.msg2        = g('txt-msg2');
+  data.msg3        = g('txt-msg3');
+  data.finaleTitle = g('txt-finale-title');
+  data.finaleSub   = g('txt-finale-sub');
+  data.finaleSign  = g('txt-finale-sign');
+  data.password    = g('txt-password');
+  data.siteUrl     = g('txt-siteurl');
+  data.letterSalutation = g('letter-salutation');
+  data.letterBody  = g('letter-body');
+  data.letterClosing = g('letter-closing');
+  data.secretHint  = g('secret-hint-txt');
+  data.secretOpen  = g('secret-open');
+  data.secretBody  = g('secret-body');
+  data.secretClosing = g('secret-closing');
+
+  // Collect memories
+  data.memories = [];
+  document.querySelectorAll('.memory-card').forEach((card, i) => {
+    data.memories.push({
+      emoji: card.querySelector('.m-emoji').value,
+      date:  card.querySelector('.m-date').value,
+      title: card.querySelector('.m-title').value,
+      body:  card.querySelector('.m-body').value,
+      img:   card.querySelector('.m-img').value,
+    });
+  });
+
+  // Collect reasons
+  data.reasons = [];
+  document.querySelectorAll('.reason-input').forEach(el => {
+    if (el.value.trim()) data.reasons.push(el.value.trim());
+  });
+
+  localStorage.setItem(DATA_KEY, JSON.stringify(data));
+  updateDashboard();
+  toast('💾 บันทึกแล้ว', 'success');
+}
+
+/* ============================================================
+   MEMORIES
+   ============================================================ */
+function buildMemoriesList() {
+  const container = document.getElementById('memories-list');
+  container.innerHTML = '';
+  data.memories.forEach((m, i) => renderMemoryCard(m, i));
+}
+
+function renderMemoryCard(m, i) {
+  const container = document.getElementById('memories-list');
+  const card = document.createElement('div');
+  card.className = 'memory-card';
+  card.innerHTML = `
+    <div class="memory-card-header">
+      <span class="memory-card-num">Memory #${i+1}</span>
+      <button class="btn btn-danger btn-sm del-memory-btn">🗑️ ลบ</button>
+    </div>
+    <div class="form-grid form-grid-2">
+      <div class="form-row">
+        <label>Emoji</label>
+        <input class="m-emoji" type="text" value="${m.emoji||''}" maxlength="4" style="width:70px" />
+      </div>
+      <div class="form-row">
+        <label>Date / Label</label>
+        <input class="m-date" type="text" value="${m.date||''}" />
+      </div>
+      <div class="form-row" style="grid-column:1/-1">
+        <label>Title</label>
+        <input class="m-title" type="text" value="${m.title||''}" />
+      </div>
+      <div class="form-row" style="grid-column:1/-1">
+        <label>Body</label>
+        <textarea class="m-body" rows="3">${m.body||''}</textarea>
+      </div>
+    </div>
+    <div class="form-row" style="margin-top:10px">
+      <label>Image URL (วาง URL รูปภาพ หรือ Base64)</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="m-img" type="text" value="${m.img||''}" placeholder="https://... หรืออัพโหลดรูปด้านล่าง" />
+        <label class="btn btn-secondary btn-sm" style="white-space:nowrap;cursor:pointer">
+          📁 Upload<input type="file" accept="image/*" style="display:none" class="m-img-upload" />
+        </label>
+      </div>
+      <div class="memory-img-preview" style="margin-top:8px;">
+        ${m.img ? `<img src="${m.img}" />` : '<span>ยังไม่มีรูป</span>'}
+      </div>
+    </div>
+  `;
+  container.appendChild(card);
+
+  // Delete
+  card.querySelector('.del-memory-btn').addEventListener('click', () => {
+    card.remove();
+    renumberMemories();
+  });
+
+  // Image upload → Base64
+  card.querySelector('.m-img-upload').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      card.querySelector('.m-img').value = ev.target.result;
+      card.querySelector('.memory-img-preview').innerHTML = `<img src="${ev.target.result}" />`;
+      toast('✅ อัพโหลดรูปแล้ว', 'success');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Live image URL preview
+  card.querySelector('.m-img').addEventListener('input', e => {
+    const url = e.target.value;
+    card.querySelector('.memory-img-preview').innerHTML = url
+      ? `<img src="${url}" onerror="this.parentNode.innerHTML='<span>URL ไม่ถูกต้อง</span>'" />`
+      : '<span>ยังไม่มีรูป</span>';
+  });
+}
+
+function addMemory() {
+  data.memories.push({ emoji:'💕', date:'', title:'', body:'', img:'' });
+  renderMemoryCard(data.memories[data.memories.length-1], data.memories.length-1);
+  toast('➕ เพิ่ม Memory แล้ว', 'info');
+}
+
+function renumberMemories() {
+  document.querySelectorAll('.memory-card-num').forEach((el, i) => { el.textContent = `Memory #${i+1}`; });
+}
+
+/* ============================================================
+   REASONS
+   ============================================================ */
+function buildReasonsList() {
+  const container = document.getElementById('reasons-list');
+  container.innerHTML = '';
+  data.reasons.forEach(r => addReasonItem(r));
+}
+
+function addReasonItem(text='') {
+  const container = document.getElementById('reasons-list');
+  const row = document.createElement('div');
+  row.className = 'reason-item';
+  row.innerHTML = `
+    <span class="reason-drag" title="ลาก">⠿</span>
+    <input class="reason-input" type="text" value="${text}" placeholder="เหตุผลที่รัก..." />
+    <button class="btn btn-danger btn-sm" title="ลบ">✕</button>
+  `;
+  row.querySelector('.btn-danger').addEventListener('click', () => row.remove());
+  container.appendChild(row);
+}
+
+function addReason() {
+  addReasonItem('');
+  toast('➕ เพิ่ม Reason แล้ว', 'info');
+}
+
+/* ============================================================
+   COLOR GRID
+   ============================================================ */
+function buildColorGrid() {
+  const grid = document.getElementById('color-grid');
+  grid.innerHTML = '';
+  COLOR_DEFS.forEach(def => {
+    const val = data.themeColors?.[def.key] || def.default;
+    const item = document.createElement('div');
+    item.className = 'color-item';
+    item.innerHTML = `
+      <label>${def.label}</label>
+      <input type="color" class="color-swatch" data-key="${def.key}" value="${val}" />
+      <input type="text" value="${val}" style="font-size:11px;font-family:monospace" class="color-hex" />
+    `;
+    const swatchEl = item.querySelector('.color-swatch');
+    const hexEl    = item.querySelector('.color-hex');
+    swatchEl.addEventListener('input', () => { hexEl.value = swatchEl.value; });
+    hexEl.addEventListener('input', () => {
+      if (/^#[0-9a-f]{6}$/i.test(hexEl.value)) swatchEl.value = hexEl.value;
+    });
+    grid.appendChild(item);
+  });
+}
+
+function applyTheme() {
+  data.themeColors = {};
+  document.querySelectorAll('.color-swatch').forEach(el => {
+    data.themeColors[el.dataset.key] = el.value;
+  });
+  saveAll();
+  toast('🎨 Theme บันทึกแล้ว จะเห็นผลหลัง deploy', 'success');
+}
+
+function applyPreset(name) {
+  if (!PRESETS[name]) return;
+  data.themeColors = { ...PRESETS[name] };
+  buildColorGrid();
+  toast(`✅ Preset "${name}" โหลดแล้ว กด Apply & Save`, 'info');
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function updateDashboard() {
+  document.getElementById('dash-memories').textContent = data.memories?.length || 0;
+  document.getElementById('dash-reasons').textContent  = data.reasons?.length  || 0;
+  document.getElementById('dash-texts').textContent    = '✅';
+  document.getElementById('dash-deployed').textContent = data.lastDeploy
+    ? new Date(data.lastDeploy).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'})
+    : 'ยังไม่ได้ deploy';
+
+  const bar = document.getElementById('status-bar');
+  bar.innerHTML = `
+    <div class="status-item"><span class="status-dot dot-green"></span> Admin Online</div>
+    <div class="status-item"><span class="status-dot ${ghToken ? 'dot-green' : 'dot-red'}"></span> GitHub Token: <strong>${ghToken ? 'พร้อม' : 'ไม่มี'}</strong></div>
+    <div class="status-item"><span class="status-dot dot-green"></span> Repo: <strong>tomoskill/birthday</strong></div>
+    <div class="status-item">Last Deploy: <strong>${data.lastDeploy ? new Date(data.lastDeploy).toLocaleTimeString('th-TH') : '—'}</strong></div>
+  `;
+}
+
+function updateDeployLink() {
+  const user = document.getElementById('deploy-user')?.value || GITHUB_USER;
+  const repo = document.getElementById('deploy-repo')?.value || GITHUB_REPO;
+  document.getElementById('deploy-link').href = `https://${user}.github.io/${repo}`;
+}
+
+/* ============================================================
+   GENERATE script.js CONTENT
+   ============================================================ */
+function generateScriptJS(originalScript) {
+  // Replace the CUSTOMIZATION ZONE in script.js with current data
+  const memoriesJSON = JSON.stringify(data.memories, null, 2)
+    .replace(/"/g, '"');
+
+  const reasonsJSON = JSON.stringify(data.reasons, null, 2);
+
+  // Build the new customization zone
+  const newZone = `/* ============================================================
+   ✏️ CUSTOMIZATION ZONE — Edit everything in this block!
+   ============================================================ */
+
+// ── Typewriter opening line ──────────────────────────────────
+const TYPEWRITER_TEXT = ${JSON.stringify(data.typewriter)};
+
+// ── Memory timeline cards ────────────────────────────────────
+const MEMORIES = ${JSON.stringify(data.memories, null, 2)};
+
+// ── Reasons I Love You ───────────────────────────────────────
+const REASONS = ${JSON.stringify(data.reasons, null, 2)};
+
+// ── Secret password ──────────────────────────────────────────
+const SECRET_PASSWORD = ${JSON.stringify(data.password)};
+
+// ── QR code destination URL ──────────────────────────────────
+const SITE_URL = ${JSON.stringify(data.siteUrl)};
+
+/* ============================================================
+   END OF CUSTOMIZATION ZONE
+   ============================================================ */`;
+
+  // Replace between markers in original
+  // ค้นหา marker แบบ flexible รองรับทั้ง \n และ \r\n
+  const norm = originalScript.replace(/\r\n/g, '\n');
+  const startMarker = '✏️ CUSTOMIZATION ZONE';
+  const endMarker   = 'END OF CUSTOMIZATION ZONE';
+
+  const startIdx = norm.indexOf(startMarker);
+  const endIdx   = norm.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1) return null;
+
+  // ย้อนกลับไปหา /* ก่อน marker
+  const blockStart = norm.lastIndexOf('/*', startIdx);
+  // หา */ หลัง END marker
+  const blockEnd   = norm.indexOf('*/', endIdx) + 2;
+
+  return norm.substring(0, blockStart) + newZone + norm.substring(blockEnd);
+}
+
+function generateIndexHTML(original) {
+  let html = original;
+  const rep = (find, replace) => { html = html.split(find).join(replace); };
+
+  // Pre-title
+  rep('✨ A little something just for you ✨', data.pretitle);
+
+  // Landing title (multi-line → <br/>)
+  const titleParts = data.title.split('\n');
+  const newTitle = titleParts.map((p,i) => i===0 ? p : `<em>${p}</em>`).join('<br/>');
+  // Replace in h1
+  html = html.replace(/<h1 class="landing-title">.*?<\/h1>/s,
+    `<h1 class="landing-title">${newTitle}</h1>`);
+
+  // Subtitle
+  html = html.replace(/<p class="landing-subtitle">.*?<\/p>/s,
+    `<p class="landing-subtitle">To the most wonderful soul I have ever known — today is all about <em>you</em>.</p>`);
+
+  // Finale
+  html = html.replace(/<h2 class="finale-title">.*?<\/h2>/s,
+    `<h2 class="finale-title">${data.finaleTitle.replace('\n','<br/>')}</h2>`);
+  html = html.replace(/<p class="finale-sub">.*?<\/p>/s,
+    `<p class="finale-sub">${data.finaleSub}</p>`);
+  html = html.replace(/<p class="finale-sign">.*?<\/p>/s,
+    `<p class="finale-sign">${data.finaleSign}</p>`);
+
+  // Message paragraphs
+  const msgBodies = [data.msg1, data.msg2, data.msg3];
+  let msgIdx = 0;
+  html = html.replace(/<div class="message-body reveal-child">[\s\S]*?<\/div>/,
+    `<div class="message-body reveal-child">\n${msgBodies.map(m=>`          <p>${m}</p>`).join('\n')}\n        </div>`);
+
+  // Secret hint
+  html = html.replace(/<p class="secret-hint">[\s\S]*?<\/p>/,
+    `<p class="secret-hint">${data.secretHint}</p>`);
+
+  // Secret message
+  const secretParas = data.secretBody.split('\n\n').filter(p=>p.trim());
+  html = html.replace(/<div class="secret-message-content">[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/section>\s*<!-- ── SECTION 6/,
+    `<div class="secret-message-content">
+            <p class="secret-msg-line">${data.secretOpen}</p>
+            ${secretParas.map(p=>`<p>${p.replace(/\n/g,' ')}</p>`).join('\n            ')}
+            <p class="secret-msg-closing">${data.secretClosing}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ── SECTION 6`);
+
+  // Letter
+  html = html.replace(/(<p class="letter-salutation">).*?(<\/p>)/s,
+    `$1${data.letterSalutation}$2`);
+  const letterParas = data.letterBody.split('\n\n').filter(p=>p.trim());
+  html = html.replace(/<!-- ✏️ แก้จดหมายได้เลยตรงนี้[\s\S]*?<!-- END LETTER[\s\S]*?-->/,
+    `<!-- ✏️ แก้จดหมายได้เลยตรงนี้ -->
+            <p class="letter-salutation">${data.letterSalutation}</p>
+            ${letterParas.map(p=>`<p class="letter-body">${p.replace(/\n/g,' ')}</p>`).join('\n            ')}
+            <p class="letter-closing">${data.letterClosing.replace('\n','<br/>')}</p>
+            <!-- END LETTER -->`);
+
+  // Theme CSS variables
+  if (data.themeColors) {
+    const cssVars = Object.entries(data.themeColors)
+      .map(([k,v]) => `  ${k}: ${v};`).join('\n');
+    if (html.includes(':root {')) {
+      html = html.replace(/:root \{[\s\S]*?\}/, `:root {\n${cssVars}\n}`);
+    }
+  }
+
+  return html;
+}
+
+/* ============================================================
+   UTF-8 SAFE BASE64 ENCODE/DECODE
+   ============================================================ */
+function utf8ToB64(str) {
+  // String → UTF-8 bytes → base64 (รองรับ emoji และ unicode ทุกตัว)
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+
+/* ============================================================
+   DEPLOY TO GITHUB
+   ============================================================ */
+async function deployToGitHub() {
+  saveAll();
+  const user  = document.getElementById('deploy-user').value.trim();
+  const repo  = document.getElementById('deploy-repo').value.trim();
+  const token = ghToken;
+
+  if (!token) { toast('❌ ไม่มี GitHub Token', 'error'); return; }
+
+  document.getElementById('deploy-log').innerHTML = '';
+  setProgress(0);
+  document.getElementById('deploy-btn').disabled = true;
+  document.getElementById('deploy-btn').textContent = '⏳ กำลัง Deploy...';
+
+  const api = `https://api.github.com/repos/${user}/${repo}/contents/`;
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
+  };
+
+  try {
+    /* ── Step 1: Get current files ── */
+    log('📡 กำลังเชื่อมต่อ GitHub...', 'var(--text2)');
+    setProgress(10);
+
+    const filesToUpdate = ['script.js', 'index.html', 'style.css'];
+    const currentFiles = {};
+
+    for (const fname of filesToUpdate) {
+      try {
+        const res = await fetch(api + fname, { headers });
+        if (res.ok) {
+          const json = await res.json();
+          // Decode base64 → UTF-8 ถูกต้อง (รองรับ emoji และ unicode)
+          const b64 = json.content.replace(/\n/g,'');
+          const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+          const decoded = new TextDecoder('utf-8').decode(bytes);
+          currentFiles[fname] = { sha: json.sha, content: decoded };
+        }
+      } catch(e) {}
+    }
+    log('✅ ดึงไฟล์จาก GitHub แล้ว', 'var(--green)');
+    setProgress(30);
+
+    /* ── Step 2: Generate new script.js ── */
+    let newScript = currentFiles['script.js']?.content || '';
+    const generatedScript = generateScriptJS(newScript);
+    if (!generatedScript) {
+      log('❌ ไม่พบ CUSTOMIZATION ZONE ใน script.js', 'var(--red)');
+      log('🔍 ตรวจสอบ: script.js ต้องมีข้อความ "✏️ CUSTOMIZATION ZONE" และ "END OF CUSTOMIZATION ZONE"', 'var(--yellow)');
+      log(`📏 script.js length: ${newScript.length} chars`, 'var(--text2)');
+      toast('❌ script.js format ไม่ถูกต้อง', 'error');
+      document.getElementById('deploy-btn').disabled = false;
+      document.getElementById('deploy-btn').textContent = '🚀 Deploy ไปยัง GitHub Pages';
+      return;
+    }
+    log('✅ Generate script.js แล้ว', 'var(--green)');
+    setProgress(50);
+
+    /* ── Step 3: Upload script.js ── */
+    log('📤 กำลัง upload script.js...', 'var(--text2)');
+    const scriptRes = await fetch(api + 'script.js', {
+      method: 'PUT', headers,
+      body: JSON.stringify({
+        message: '🎂 Update content via Admin Panel',
+        content: utf8ToB64(generatedScript),
+        sha: currentFiles['script.js']?.sha,
+      })
+    });
+    if (!scriptRes.ok) {
+      const err = await scriptRes.json();
+      throw new Error(`script.js: ${err.message}`);
+    }
+    log('✅ script.js อัพเดตแล้ว', 'var(--green)');
+    setProgress(70);
+
+    /* ── Step 4: Upload style.css (theme colors) ── */
+    if (data.themeColors && currentFiles['style.css']) {
+      log('📤 กำลัง upload style.css (theme)...', 'var(--text2)');
+      let css = currentFiles['style.css'].content;
+      // Inject CSS variables
+      const colorOverride = Object.entries(data.themeColors)
+        .map(([k,v]) => `  ${k}: ${v};`).join('\n');
+      css = css.replace(/:root \{([^}]*)\}/, `:root {\n${colorOverride}\n}`);
+
+      const cssRes = await fetch(api + 'style.css', {
+        method: 'PUT', headers,
+        body: JSON.stringify({
+          message: '🎨 Update theme via Admin Panel',
+          content: utf8ToB64(css),
+          sha: currentFiles['style.css']?.sha,
+        })
+      });
+      if (!cssRes.ok) log('⚠️ style.css อัพเดตไม่สำเร็จ (ข้ามไป)', 'var(--yellow)');
+      else log('✅ style.css อัพเดตแล้ว', 'var(--green)');
+    }
+    setProgress(90);
+
+    /* ── Done ── */
+    setProgress(100);
+    data.lastDeploy = new Date().toISOString();
+    localStorage.setItem(DATA_KEY, JSON.stringify(data));
+    updateDashboard();
+    updateDeployLink();
+
+    log('', '');
+    log('🎉 Deploy สำเร็จ!', 'var(--green)');
+    log(`🌐 เว็บไซต์: https://${user}.github.io/${repo}`, 'var(--accent)');
+    log('⏳ GitHub Pages ใช้เวลาประมาณ 1-2 นาทีในการ update', 'var(--text2)');
+
+    toast('🚀 Deploy สำเร็จ! รอ 1-2 นาทีแล้วเปิดเว็บได้เลย', 'success');
+
+  } catch(err) {
+    log(`❌ Error: ${err.message}`, 'var(--red)');
+    toast(`❌ Deploy ไม่สำเร็จ: ${err.message}`, 'error');
+    setProgress(0);
+  } finally {
+    document.getElementById('deploy-btn').disabled = false;
+    document.getElementById('deploy-btn').textContent = '🚀 Deploy ไปยัง GitHub Pages';
+  }
+}
+
+/* ============================================================
+   CHANGE ADMIN PASSWORD
+   ============================================================ */
+function changePass() {
+  const np = document.getElementById('new-admin-pass').value;
+  const cp = document.getElementById('confirm-admin-pass').value;
+  if (!np) { toast('❌ กรุณากรอก password ใหม่', 'error'); return; }
+  if (np !== cp) { toast('❌ Password ไม่ตรงกัน', 'error'); return; }
+  localStorage.setItem(ADMIN_PASS_KEY, np);
+  document.getElementById('new-admin-pass').value = '';
+  document.getElementById('confirm-admin-pass').value = '';
+  toast('✅ เปลี่ยน Password แล้ว', 'success');
+}
+</script>
+</body>
+</html>
