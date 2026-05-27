@@ -5,30 +5,12 @@
 
 /* ── 1. CSS VARIABLES ── */
 :root {
-  --pink-soft:    #f9c5d1;
-  --pink-mid:     #f4a0b5;
-  --pink-deep:    #e8789a;
-  --rose:         #c9506e;
-  --cream:        #fff8f4;
-  --cream-mid:    #fdf0ea;
-  --peach:        #fde0d0;
-  --gold:         #e8c49a;
-  --gold-light:   #f5e4c8;
-  --white:        #ffffff;
-  --text-dark:    #3d2430;
-  --text-mid:     #7a4560;
-  --text-light:   #b07090;
-
-  --font-display: 'Playfair Display', serif;
-  --font-body:    'Cormorant Garamond', serif;
-  --font-script:  'Dancing Script', cursive;
-
-  --radius-card:  20px;
-  --shadow-soft:  0 8px 32px rgba(200, 80, 110, 0.12);
-  --shadow-card:  0 4px 24px rgba(200, 80, 110, 0.16);
-  --transition:   0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-  --section-pad:  clamp(60px, 10vw, 120px);
+  --pink-soft: #f9c5d1;
+  --pink-mid: #f4a0b5;
+  --pink-deep: #e8789a;
+  --rose: #c9506e;
+  --cream: #fff8f4;
+  --peach: #fde0d0;
 }
 
 /* ── 2. RESET & BASE ── */
