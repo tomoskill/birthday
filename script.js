@@ -10,57 +10,48 @@
    ============================================================ */
 
 // ── Typewriter opening line ──────────────────────────────────
-// ✏️ EDIT: The first animated line on the message section
 const TYPEWRITER_TEXT = "To my favorite person in the whole universe… 💕";
 
 // ── Memory timeline cards ────────────────────────────────────
-// ✏️ EDIT: Add/remove/change memory cards
-// For image: put your image URL in the `img` field, or leave as "" for placeholder
 const MEMORIES = [
   {
-    emoji: "🌸",
-    date:  "The beginning",
-    title: "The First Hello",
-    body:  "I still remember the first time we talked. Something in the universe shifted that day — though I didn't know it yet.",
-    img:   "",   // ✏️ Replace with image URL or leave empty
-    imgLabel: "📸 Add your photo here"
+    "emoji": "🌸",
+    "date": "The beginning",
+    "title": "The First Hello",
+    "body": "I still remember the first time we talked. Something in the universe shifted that day.",
+    "img": ""
   },
   {
-    emoji: "😂",
-    date:  "A little later",
-    title: "The First Real Laugh",
-    body:  "You laughed so hard at something ridiculous, and I realized — I wanted to hear that laugh forever.",
-    img:   "",
-    imgLabel: "📸 Add your photo here"
+    "emoji": "😂",
+    "date": "A little later",
+    "title": "The First Real Laugh",
+    "body": "You laughed so hard at something ridiculous, and I realized — I wanted to hear that laugh forever.",
+    "img": ""
   },
   {
-    emoji: "💫",
-    date:  "Our anniversary",
-    title: "The Day It Became Official",
-    body:  "The day I got to call you mine. I smiled so wide my cheeks hurt for a week.",
-    img:   "",
-    imgLabel: "📸 Add your photo here"
+    "emoji": "💫",
+    "date": "Our anniversary",
+    "title": "The Day It Became Official",
+    "body": "The day I got to call you mine. I smiled so wide my cheeks hurt for a week.",
+    "img": ""
   },
   {
-    emoji: "🌙",
-    date:  "A night to remember",
-    title: "Our Favorite Memory",
-    body:  "That evening felt like it was made just for us. Time stopped, and all that existed was you and me.",
-    img:   "",
-    imgLabel: "📸 Add your photo here"
+    "emoji": "🌙",
+    "date": "A night to remember",
+    "title": "Our Favorite Memory",
+    "body": "That evening felt like it was made just for us. Time stopped, and all that existed was you and me.",
+    "img": ""
   },
   {
-    emoji: "🎂",
-    date:  "Today",
-    title: "Your Birthday 🎉",
-    body:  "Today we celebrate the day the world became infinitely more wonderful — the day you were born.",
-    img:   "",
-    imgLabel: "📸 Add today's photo"
+    "emoji": "🎂",
+    "date": "Today",
+    "title": "Your Birthday 🎉",
+    "body": "Today we celebrate the day the world became infinitely more wonderful.",
+    "img": ""
   }
 ];
 
 // ── Reasons I Love You ───────────────────────────────────────
-// ✏️ EDIT: Add as many reasons as you like!
 const REASONS = [
   "The way your eyes light up when you talk about something you love.",
   "How genuinely kind you are to every single person.",
@@ -68,24 +59,15 @@ const REASONS = [
   "The way you make ordinary moments feel magical.",
   "Your curiosity — you make life more interesting just by being in it.",
   "How deeply you feel everything; your sensitivity is a superpower.",
-  "The way you always know the right thing to say.",
-  "Your creativity and the way you see beauty in unexpected places.",
-  "How you make everyone around you feel valued and seen.",
   "The warmth you carry — like being near a fireplace on a cold night.",
-  "Your honesty, even when it's hard.",
-  "The little things — your voice, your gestures, the way you smile when you're thinking.",
-  "How passionate you are about the things you love.",
-  "The way you believe in people, including me.",
-  "Simply… you. Every complicated, beautiful, wonderful part of you.",
+  "Simply… you. Every complicated, beautiful, wonderful part of you."
 ];
 
 // ── Secret password ──────────────────────────────────────────
-// ✏️ EDIT: Change to your anniversary date in DDMMYYYY format
 const SECRET_PASSWORD = "14022025";
 
 // ── QR code destination URL ──────────────────────────────────
-// ✏️ EDIT: Your deployed GitHub Pages URL
-const SITE_URL = "https://yourname.github.io/birthday";
+const SITE_URL = "https://tomoskill.github.io/birthday";
 
 /* ============================================================
    END OF CUSTOMIZATION ZONE
